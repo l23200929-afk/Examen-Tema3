@@ -1,0 +1,238 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Macario Jimenes - Boutique</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f5f5f5;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      text-align: center;
+      margin-bottom: 30px;
+      letter-spacing: 3px;
+    }
+
+    /* Tarjeta elegante */
+    .producto {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid #eee;
+    }
+
+    .producto:hover {
+      transform: translateY(-5px);
+      box-shadow: 0px 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .producto img {
+      width: 100%;
+      height: 260px;
+      object-fit: cover;
+    }
+
+    .producto-info {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .producto-info h5 {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .precio {
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    /* Botón elegante */
+    .btn-moderno {
+      background: black;
+      color: white;
+      border-radius: 30px;
+      padding: 8px;
+      transition: 0.3s;
+    }
+
+    .btn-moderno:hover {
+      background: #444;
+    }
+
+    /* Carrito */
+    .card {
+      border-radius: 12px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container my-5">
+  <h1>MACARIO JIMENES</h1>
+
+  <div class="row" id="productos"></div>
+
+  <hr class="my-5">
+
+  <div class="card shadow">
+    <div class="card-header bg-dark text-white">
+      <h4 class="mb-0">Carrito de compras</h4>
+    </div>
+
+    <div class="card-body">
+      <ul id="carrito" class="list-group mb-3"></ul>
+      <h4>Total: $<span id="total">0.00</span></h4>
+      <button class="btn btn-danger" onclick="vaciarCarrito()">Vaciar carrito</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+const productos = [
+  {
+    id: 1,
+    nombre: "Vestido corto de seda",
+    precio: 3200,
+    imagen: "https://media.vogue.mx/photos/640bc300ba77fefd12ce3d48/3:2/w_2012,h_1341,c_limit/macario-jimenez-vestidos-disen%CC%83ador-mexicano.jpg"
+  },
+  {
+    id: 2,
+    nombre: "Vestido estilo Renancentista",
+    precio: 1800,
+    imagen: "https://macariojimenez.com/cdn/shop/collections/1_1024x1024.jpg?v=1613754398"
+  },
+  {
+    id: 3,
+    nombre: "Vestido Lago de los cisnes",
+    precio: 2100,
+    imagen: "https://media.fashionnetwork.com/cdn-cgi/image/fit=cover,width=335,height=335,format=auto/m/3ee3/7f02/1f3f/5ddb/a015/030e/f52a/df63/e2e4/1afd/1afd.jpg"
+  },
+  {
+    id: 4,
+    nombre: "Vestido minimalista",
+    precio: 4500,
+    imagen: "https://images.inmexico.com/2017/02/bonito-692x1024.jpg"
+  },
+  {
+    id: 5,
+    nombre: "Conjunto falta y bluson",
+    precio: 3800,
+    imagen: "https://i.blogs.es/2e0951/macariofw0907/450_1000.jpg"
+  }
+];
+
+let carrito = [];
+
+function mostrarProductos() {
+  const contenedor = document.getElementById("productos");
+
+  productos.forEach(producto => {
+    contenedor.innerHTML += `
+      <div class="col-md-3 mb-4">
+        <div class="producto">
+          <img src="${producto.imagen}">
+          
+          <div class="producto-info">
+            <h5>${producto.nombre}</h5>
+            <p class="precio">$${producto.precio.toFixed(2)}</p>
+
+            <input type="number" 
+              id="cantidad-${producto.id}" 
+              class="form-control mb-2" 
+              value="1" min="1">
+
+            <button class="btn btn-moderno w-100"
+              onclick="agregarCarrito(${producto.id})">
+              Agregar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+}
+
+function agregarCarrito(id) {
+  const producto = productos.find(p => p.id === id);
+  const cantidad = parseInt(document.getElementById(`cantidad-${id}`).value);
+
+  if (cantidad <= 0 || isNaN(cantidad)) {
+    alert("Cantidad inválida");
+    return;
+  }
+
+  const existe = carrito.find(item => item.id === id);
+
+  if (existe) {
+    existe.cantidad += cantidad;
+  } else {
+    carrito.push({ ...producto, cantidad });
+  }
+
+  mostrarCarrito();
+}
+
+function mostrarCarrito() {
+  const lista = document.getElementById("carrito");
+  const totalHTML = document.getElementById("total");
+
+  lista.innerHTML = "";
+  let total = 0;
+
+  carrito.forEach(item => {
+    const subtotal = item.precio * item.cantidad;
+    total += subtotal;
+
+    lista.innerHTML += `
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <strong>${item.nombre}</strong><br>
+          Cantidad: ${item.cantidad}
+        </div>
+
+        <div>
+          <span>$${subtotal.toFixed(2)}</span>
+          <button class="btn btn-sm btn-danger"
+            onclick="eliminarProducto(${item.id})">
+            X
+          </button>
+        </div>
+      </li>
+    `;
+  });
+
+  totalHTML.innerText = total.toFixed(2);
+}
+
+function eliminarProducto(id) {
+  carrito = carrito.filter(item => item.id !== id);
+  mostrarCarrito();
+}
+
+function vaciarCarrito() {
+  carrito = [];
+  mostrarCarrito();
+}
+
+mostrarProductos();
+
+</script>
+
+</body>
+</html>
+
